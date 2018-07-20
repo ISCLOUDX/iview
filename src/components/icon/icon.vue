@@ -7,6 +7,17 @@
     export default {
         name: 'Icon',
         props: {
+            env: {
+                type: String,
+                validator(value) {
+                    if (['ios', 'md'].includes(value)) {
+                        return true;
+                    }
+                    console.warn('Icon组件只具有ios和md两种env');
+                    return false;
+                },
+                default: 'ios'
+            },
             type: {
                 type: String,
                 default: ''
@@ -19,16 +30,16 @@
             }
         },
         computed: {
-            classes () {
+            classes() {
                 return [
                     `${prefixCls}`,
                     {
-                        [`${prefixCls}-${this.type}`]: this.type !== '',
+                        [`${prefixCls}-${this.env}-${this.type}`]: this.type !== '',
                         [`${this.custom}`]: this.custom !== '',
                     }
                 ];
             },
-            styles () {
+            styles() {
                 let style = {};
 
                 if (this.size) {
@@ -43,7 +54,7 @@
             }
         },
         methods: {
-            handleClick (event) {
+            handleClick(event) {
                 this.$emit('click', event);
             }
         }

@@ -1,10 +1,14 @@
 <template>
     <div :class="classes">
-        <label :class="[prefixCls + '-label']" :for="labelFor" :style="labelStyles" v-if="label || $slots.label"><slot name="label">{{ label }}</slot></label>
+        <label :class="[prefixCls + '-label']" :for="labelFor" :style="labelStyles" v-if="label || $slots.label">
+            <slot name="label">{{ label }}</slot>
+        </label>
         <div :class="[prefixCls + '-content']" :style="contentStyles">
             <slot></slot>
             <transition name="fade">
-                <div :class="[prefixCls + '-error-tip']" v-if="validateState === 'error' && showMessage && form.showMessage">{{ validateMessage }}</div>
+                <div :class="[prefixCls + '-error-tip']"
+                     v-if="validateState === 'error' && showMessage && form.showMessage">{{ validateMessage }}
+                </div>
             </transition>
         </div>
     </div>
@@ -40,7 +44,7 @@
 
     export default {
         name: 'FormItem',
-        mixins: [ Emitter ],
+        mixins: [Emitter],
         props: {
             label: {
                 type: String,
@@ -73,7 +77,7 @@
                 type: String
             }
         },
-        data () {
+        data() {
             return {
                 prefixCls: prefixCls,
                 isRequired: false,
@@ -84,17 +88,17 @@
             };
         },
         watch: {
-            error (val) {
+            error(val) {
                 this.validateMessage = val;
                 this.validateState = val === '' ? '' : 'error';
             },
-            validateStatus (val) {
+            validateStatus(val) {
                 this.validateState = val;
             }
         },
         inject: ['form'],
         computed: {
-            classes () {
+            classes() {
                 return [
                     `${prefixCls}`,
                     {
@@ -115,7 +119,9 @@
                 cache: false,
                 get() {
                     const model = this.form.model;
-                    if (!model || !this.prop) { return; }
+                    if (!model || !this.prop) {
+                        return;
+                    }
 
                     let path = this.prop;
                     if (path.indexOf(':') !== -1) {
@@ -125,15 +131,15 @@
                     return getPropByPath(model, path).v;
                 }
             },
-            labelStyles () {
+            labelStyles() {
                 let style = {};
                 const labelWidth = this.labelWidth || this.form.labelWidth;
-                if (labelWidth) {
+                if (labelWidth === 0 || labelWidth) {
                     style.width = `${labelWidth}px`;
                 }
                 return style;
             },
-            contentStyles () {
+            contentStyles() {
                 let style = {};
                 const labelWidth = this.labelWidth || this.form.labelWidth;
                 if (labelWidth) {
@@ -143,7 +149,7 @@
             }
         },
         methods: {
-            getRules () {
+            getRules() {
                 let formRules = this.form.rules;
                 const selfRules = this.rules;
 
@@ -151,12 +157,13 @@
 
                 return [].concat(selfRules || formRules || []);
             },
-            getFilteredRule (trigger) {
+            getFilteredRule(trigger) {
                 const rules = this.getRules();
 
                 return rules.filter(rule => !rule.trigger || rule.trigger.indexOf(trigger) !== -1);
             },
-            validate(trigger, callback = function () {}) {
+            validate(trigger, callback = function () {
+            }) {
                 const rules = this.getFilteredRule(trigger);
                 if (!rules || rules.length === 0) {
                     callback();
@@ -173,7 +180,7 @@
 
                 model[this.prop] = this.fieldValue;
 
-                validator.validate(model, { firstFields: true }, errors => {
+                validator.validate(model, {firstFields: true}, errors => {
                     this.validateState = !errors ? 'success' : 'error';
                     this.validateMessage = errors ? errors[0].message : '';
 
@@ -181,7 +188,7 @@
                 });
                 this.validateDisabled = false;
             },
-            resetField () {
+            resetField() {
                 this.validateState = '';
                 this.validateMessage = '';
 
@@ -221,7 +228,7 @@
                 this.validate('change');
             }
         },
-        mounted () {
+        mounted() {
             if (this.prop) {
                 this.dispatch('iForm', 'on-form-item-add', this);
 
@@ -243,7 +250,7 @@
                 }
             }
         },
-        beforeDestroy () {
+        beforeDestroy() {
             this.dispatch('iForm', 'on-form-item-remove', this);
         }
     };
